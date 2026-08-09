@@ -311,11 +311,15 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 			this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
 		} else {
 			this.header_icon = this.get_default_icon();
-			this.header_icon = `<img src=${this.header_icon}></img>`;
+			if (this.header_icon) {
+				this.header_icon = `<img src=${this.header_icon}></img>`;
+			} else {
+				this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
+			}
 		}
 	}
 	get_default_icon() {
-		return frappe.boot.app_data[0].app_logo_url;
+		return (frappe.boot.app_data || []).map((a) => a.app_logo_url).find(Boolean);
 	}
 	get_desktop_icon_by_label(title, filters) {
 		if (!filters) {
@@ -356,10 +360,11 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 					${
 						item.icon
 							? frappe.utils.icon(item.icon)
-							: `<img
-							class="logo"
-							src="${item.icon_url}"
-						>`
+							: item.icon_html
+							? item.icon_html
+							: item.icon_url
+							? `<img class="logo" src="${item.icon_url}">`
+							: ""
 					}
 				</div>
 				<span class="menu-item-title">${item.label}</span>
