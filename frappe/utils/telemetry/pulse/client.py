@@ -11,6 +11,11 @@ from frappe.utils.frappecloud import on_frappecloud
 from .utils import anonymize_user, ensure_http, parse_interval, utc_iso
 
 
+@frappe.whitelist(allow_guest=True)
+def boot_config() -> dict:
+	return {"enabled": False}
+
+
 @frappe.whitelist()
 @site_cache(ttl=60 * 60)
 def is_enabled() -> bool:
