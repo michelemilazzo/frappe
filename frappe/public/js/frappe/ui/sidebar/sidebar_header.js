@@ -321,6 +321,7 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 		const CORE_APPS = new Set([
 			"frappe", "erpnext", "payments", "webshop", "builder",
 			"builder_hub", "studio", "forms", "letters", "frappe_ai",
+			"mmos_brand", "shop",
 		]);
 		for (const a of (frappe.boot.app_data || [])) {
 			if (CORE_APPS.has(a.app_name)) continue;
