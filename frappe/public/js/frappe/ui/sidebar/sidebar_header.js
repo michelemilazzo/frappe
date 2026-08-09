@@ -297,6 +297,11 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 		this.$drop_icon = this.wrapper.find(".drop-icon");
 	}
 	set_header_icon() {
+		const custom_logo = this.get_default_icon();
+		if (custom_logo) {
+			this.header_icon = `<img src=${custom_logo}></img>`;
+			return;
+		}
 		let desktop_icon = this.get_desktop_icon_by_label(this.sidebar.sidebar_title);
 		let desktop_icon_url =
 			desktop_icon && frappe.utils.get_desktop_icon(desktop_icon.label, "solid");
@@ -307,19 +312,22 @@ frappe.ui.SidebarHeader = class SidebarHeader {
 			this.header_icon = desktop_icon.logo_url;
 			this.header_icon = `<img src=${this.header_icon}></img>`;
 		} else if (this.sidebar.sidebar_data) {
-			this.header_icon = this.sidebar.sidebar_data.header_icon;
 			this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
 		} else {
-			this.header_icon = this.get_default_icon();
-			if (this.header_icon) {
-				this.header_icon = `<img src=${this.header_icon}></img>`;
-			} else {
-				this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
-			}
+			this.header_icon = frappe.utils.desktop_icon(this.sidebar.sidebar_title, "gray", "sm");
 		}
 	}
 	get_default_icon() {
-		return (frappe.boot.app_data || []).map((a) => a.app_logo_url).find(Boolean);
+		const CORE_APPS = new Set([
+			"frappe", "erpnext", "payments", "webshop", "builder",
+			"builder_hub", "studio", "forms", "letters", "frappe_ai",
+		]);
+		for (const a of (frappe.boot.app_data || [])) {
+			if (CORE_APPS.has(a.app_name)) continue;
+			const url = Array.isArray(a.app_logo_url) ? a.app_logo_url[0] : a.app_logo_url;
+			if (url) return url;
+		}
+		return null;
 	}
 	get_desktop_icon_by_label(title, filters) {
 		if (!filters) {
